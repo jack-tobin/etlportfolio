@@ -1,2 +1,2 @@
-# etlportfolio_tobja
+# etlportfolio
 Expected tail loss portfolio optimisation in Python
