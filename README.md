@@ -15,7 +15,8 @@ This package contains portfolio optimisation class structures to perform alterna
 from etlportfolio import data, portfolio
 
 # historical asset return data
-# returns = pd.DataFrame() of size n_periods x n_assets
+tickers = [...]
+returns = data.get_prices(tickers, '1W')
 
 # simple historical estimates of returns and VCV, though this
 # can be generated from any forecasting process.
