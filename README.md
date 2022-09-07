@@ -6,6 +6,9 @@ This package contains portfolio optimisation class structures to perform alterna
 
 ## Installation
 
+```bash
+$ pip install etlportfolio
+```
 
 ## Usage
 
