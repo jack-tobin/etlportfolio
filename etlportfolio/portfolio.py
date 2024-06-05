@@ -54,8 +54,8 @@ class Portfolio(ABC):
         self.forecast_returns = forecast_returns
         self.forecast_variance = forecast_variance
 
-    @abstractmethod
     @property
+    @abstractmethod
     def risk_name(self) -> str:
         """Return name of risk criterion."""
 
@@ -68,11 +68,6 @@ class Portfolio(ABC):
         weights : np.ndarray
             Vector of portfolio weights
 
-        Returns
-        -------
-        float
-            The value of the risk criterion.
-
         """
 
     @abstractmethod
@@ -83,11 +78,6 @@ class Portfolio(ABC):
         ----------
         weights : np.ndarray
             Vector of portoflio weights.
-
-        Returns
-        -------
-        float
-            The value of the portfolio objective function.
 
         """
 
@@ -104,30 +94,27 @@ class Portfolio(ABC):
             a warning to notify the user of such result.
 
         """
-        constraints = [{'type': 'eq', 'fun': lambda x: np.sum(x) - 1},
-                       {'type': 'ineq', 'fun': lambda x: x}]
+        constraints = [
+            {"type": "eq", "fun": lambda x: np.sum(x) - 1},
+            {"type": "ineq", "fun": lambda x: x},
+        ]
 
         optimized = minimize(
             fun=self.objective,
             x0=np.ones(self.n_assets) / self.n_assets,
             constraints=constraints,
-            options={'disp': False},
+            options={"disp": False},
         )
 
         self.weights = optimized.x
 
         if not optimized.success:
-            raise RuntimeError(f'Error in optimization: {optimized.message}')
+            raise RuntimeError(f"Error in optimization: {optimized.message}")
 
     def frontier(self) -> plt.Axes:
         """Generate a Monte Carlo efficient frontier of returns against risk.
 
         Uses random returns from a Dirichlet distribution.
-
-        Returns
-        -------
-        plt.Axes
-            Plot figure axis.
 
         """
         n_simulations = 10000
@@ -138,12 +125,12 @@ class Portfolio(ABC):
         portfolio_risk = np.apply_along_axis(self.risk_criterion, arr=weights, axis=1)
         return_over_risk = portfolio_returns / portfolio_risk
 
-        cmap = sns.color_palette('viridis', as_cmap=True)
+        cmap = sns.color_palette("viridis", as_cmap=True)
         fig, ax = plt.subplots(1)
         ax.scatter(x=portfolio_risk, y=portfolio_returns, c=return_over_risk, cmap=cmap)
-        ax.set_ylabel('Portfolio return')
-        ax.set_xlabel('Portfolio ' + self.risk_name)
-        fig.suptitle(f'Efficient frontier of {n_simulations} simulated portfolios')
+        ax.set_ylabel("Portfolio return")
+        ax.set_xlabel("Portfolio " + self.risk_name)
+        fig.suptitle(f"Efficient frontier of {n_simulations} simulated portfolios")
 
         return ax
 
@@ -175,9 +162,9 @@ class MVOPortfolio(Portfolio):
 
     lambda_: float = field(default=None)
 
+    @property
     def risk_name(self) -> str:
-        """Return name of MVO risk."""
-        return 'Volatility'
+        return "Volatility"
 
     def risk_criterion(self, weights: np.ndarray) -> float:
         """Compute portfolio variance.
@@ -186,11 +173,6 @@ class MVOPortfolio(Portfolio):
         ----------
         weights : np.ndarray
             Vector of portfolio weights
-
-        Returns
-        -------
-        float
-            Portfolio variance given weights.
 
         """
         return np.sqrt(np.dot(weights.T, np.dot(self.forecast_variance, weights)))
@@ -202,11 +184,6 @@ class MVOPortfolio(Portfolio):
         ----------
         weights : np.ndarray
             Vector of portfolio weights
-
-        Returns
-        -------
-        float
-            Portfolio utility value.
 
         """
         port_ret = np.dot(weights.T, self.forecast_returns)
@@ -243,9 +220,9 @@ class LPMPortfolio(Portfolio):
     power: int = field(default=2)
     tau: float = field(default=0)
 
+    @property
     def risk_name(self) -> str:
-        """Return name of LPM risk."""
-        return 'Lower Partial Moment'
+        return "Lower Partial Moment"
 
     def risk_criterion(self, weights: np.ndarray) -> float:
         """Compute the lower partial moment risk criterion.
@@ -255,16 +232,12 @@ class LPMPortfolio(Portfolio):
         weights : np.ndarray
             Vector of portfolio weights.
 
-        Returns
-        -------
-        float
-            value of lower partial moment.
-
         """
         port_ret = np.dot(weights.T, self.forecast_returns)
         port_vol = np.sqrt(np.dot(weights.T, np.dot(self.forecast_variance, weights)))
         lpm_result = quad(
-            lambda x: (self.tau - x)**self.power * norm.pdf(x, loc=port_ret, scale=port_vol),
+            lambda x: (self.tau - x) ** self.power
+            * norm.pdf(x, loc=port_ret, scale=port_vol),
             -np.inf,
             self.tau,
         )
@@ -277,11 +250,6 @@ class LPMPortfolio(Portfolio):
         ----------
         weights : np.ndarray
             Vector of portfolio weights.
-
-        Returns
-        -------
-        float
-            Value of portfolio utility
 
         """
         port_ret = np.dot(weights.T, self.forecast_returns)
@@ -326,9 +294,9 @@ class CVaRPortfolio(Portfolio):
     theta: float = field(default=0.05)
     power: int = field(default=1)
 
+    @property
     def risk_name(self) -> str:
-        """Return name of CVaR risk."""
-        return 'Conditional Value-at-Risk'
+        return "Conditional Value-at-Risk"
 
     def risk_criterion(self, weights: np.ndarray) -> float:
         """Compute conditional value at risk criterion.
@@ -337,11 +305,6 @@ class CVaRPortfolio(Portfolio):
         ----------
         weights : np.ndarray
             Vector of portfolio weights.
-
-        Returns
-        -------
-        float
-            value of conditional value at risk.
 
         """
         port_ret = np.dot(weights.T, self.forecast_returns)
@@ -363,11 +326,6 @@ class CVaRPortfolio(Portfolio):
         ----------
         weights : np.ndarray
             Vector of portfolio weights.
-
-        Returns
-        -------
-        float
-            Portfolio utility value
 
         """
         port_ret = np.dot(weights.T, self.forecast_returns)
@@ -409,9 +367,9 @@ class ETLPortfolio(Portfolio):
 
     k: float
 
+    @property
     def risk_name(self) -> str:
-        """Return name of ETL risk."""
-        return 'Expected Tail Loss'
+        return "Expected Tail Loss"
 
     def risk_criterion(self, weights: np.ndarray) -> float:
         """Compute  expected tail loss risk constraint.
@@ -420,11 +378,6 @@ class ETLPortfolio(Portfolio):
         ----------
         weights : np.ndarray
             Vector of portfolio weights.
-
-        Returns
-        -------
-        float
-            Value of ETL
 
         """
         port_ret = np.dot(weights.T, self.forecast_returns)
@@ -445,11 +398,6 @@ class ETLPortfolio(Portfolio):
         ----------
         weights : np.ndarray
             Vector of portfolio weights.
-
-        Returns
-        -------
-        float
-            Portfolio utility value.
 
         """
         port_ret = np.dot(weights.T, self.forecast_returns)
