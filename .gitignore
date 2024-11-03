@@ -4,3 +4,14 @@ LICENSE
 .venv
 .vscode
 *.egg-info/
+
+# Build
+build/
+dist/
+
+# Cython
+*.c
+*.pyx
+*.pxd
+*.so
+
