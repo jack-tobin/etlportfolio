@@ -39,7 +39,7 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest  # or use the command specific to your test suite
+          pytest
 
   # Job 2: Build and Publish to PyPI
   publish:
