@@ -67,7 +67,7 @@ jobs:
 
       - name: Bump version
         run: |
-          current_version=$(cat setup.py | grep version | head -n 1 | awk -F' = ' '{print $2}' | sed 's/"//g')
+          current_version=$(grep -m1 'version=' setup.py | cut -d'"' -f2)
           echo "Current version: $current_version"
           IFS='.' read -r major minor patch <<< "$current_version"
           new_patch=$((patch + 1))
