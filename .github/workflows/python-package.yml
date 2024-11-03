@@ -29,11 +29,11 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build pytest numpy Cython>=3.0
+          pip install build pytest numpy Cython>=3.0 wheel setuptools
           pip install -r requirements.txt
 
       - name: Build the package
-        run: python setup.py build
+        run: python setup.py bdist_wheel
 
       - name: Install built package
         run: |
@@ -76,10 +76,10 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install build pytest numpy Cython>=3.0
+          pip install build pytest numpy Cython>=3.0 wheel setuptools
 
       - name: Build the package
-        run: python setup.py build
+        run: python setup.py bdist_wheel
 
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
