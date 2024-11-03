@@ -41,13 +41,11 @@ class CustomBuildHook(BuildHookInterface):
         dist = Distribution({
             'name': 'etlportfolio',
             'ext_modules': build_data['extensions'],
-            'script_name': None,
-            'script_args': ['build_ext', '--inplace'],
         })
 
         # Create and configure build_ext command
         cmd = build_ext(dist)
-        cmd.inplace = True
+        cmd.inplace = False
         cmd.force = True
         cmd.extensions = build_data['extensions']
         cmd.build_lib = build_dir
