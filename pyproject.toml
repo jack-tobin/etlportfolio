@@ -41,3 +41,4 @@ packages = ["etlportfolio"]
 
 [tool.hatch.build.hooks.custom]
 dependencies = ["Cython>=3.0", "numpy"]
+path = "hatch_build.py"

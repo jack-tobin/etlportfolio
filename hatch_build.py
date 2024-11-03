@@ -3,25 +3,19 @@ from Cython.Build import cythonize
 from distutils.core import Extension, Distribution
 from distutils.command.build_ext import build_ext
 import numpy as np
-import glob
-import os
+
 
 class CustomBuildHook(BuildHookInterface):
     def initialize(self, version, build_data):
         include_dirs = [np.get_include()]
 
-        pyx_files = glob.glob("etlportfolio/optimized/*.pyx")
-
-        extensions = []
-        for pyx_file in pyx_files:
-            module_path = os.path.splitext(pyx_file)[0].replace("/", ".")
-            extensions.append(
-                Extension(
-                    module_path,
-                    [pyx_file],
-                    include_dirs=include_dirs,
-                ),
-            )
+        extensions = [
+            Extension(
+                "etlportfolio.optimized.risk_criteria",
+                ["etlportfolio/optimized/risk_criteria.pyx"],
+                include_dirs=include_dirs,
+            ),
+        ]
 
         ext_modules = cythonize(
             extensions,
