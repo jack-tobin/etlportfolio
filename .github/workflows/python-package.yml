@@ -27,8 +27,20 @@ jobs:
           pip install build pytest numpy Cython>=3.0
           pip install -r requirements.txt
 
+      - name: Debug directory structure
+        run: |
+          echo "Current directory structure:"
+          ls -R
+
       - name: Build the package
         run: python -m build
+
+      - name: Debug build artifacts
+        run: |
+          echo "Build directory contents:"
+          ls -R dist/
+          echo "Wheel file contents:"
+          unzip -l dist/*.whl
 
       - name: Install built package
         run: |
