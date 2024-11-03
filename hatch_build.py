@@ -1,3 +1,4 @@
+import os
 from hatchling.builders.hooks.plugin.interface import BuildHookInterface
 from Cython.Build import cythonize
 from distutils.core import Extension, Distribution
@@ -34,16 +35,25 @@ class CustomBuildHook(BuildHookInterface):
         if 'extensions' not in build_data:
             return
 
+        build_dir = os.path.dirname(artifact_path)
+
         # Create a Distribution instance
         dist = Distribution({
             'name': 'etlportfolio',
             'ext_modules': build_data['extensions'],
+            'script_name': None,
+            'script_args': ['build_ext', '--inplace'],
         })
 
         # Create and configure build_ext command
         cmd = build_ext(dist)
         cmd.inplace = True
+        cmd.force = True
         cmd.extensions = build_data['extensions']
+        cmd.build_lib = build_dir
+        cmd.build_temp = os.path.join(build_dir, 'temp')
+
+        os.makedirs(cmd.build_temp, exist_ok=True)
 
         # Build in place
         cmd.ensure_finalized()
