@@ -66,20 +66,7 @@ jobs:
           python-version: '3.10'
 
       - name: Bump version
-        run: |
-          current_version=$(grep -m1 'version=' setup.py | cut -d'"' -f2)
-          echo "Current version: $current_version"
-          IFS='.' read -r major minor patch <<< "$current_version"
-          new_patch=$((patch + 1))
-          new_version="${major}.${minor}.${new_patch}"
-          echo "New version: $new_version"
-          sed -i "s/^version=.*/version=\"$new_version\"/" setup.py
-
-          git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          git config --local user.name "github-actions[bot]"
-          git add setup.py
-          git commit -m "Bump version to $new_version"
-          git push
+        run: sh scripts/bump_version.sh
 
       - name: Install system dependencies
         run: |
