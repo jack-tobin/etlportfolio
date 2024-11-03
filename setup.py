@@ -5,7 +5,6 @@ import numpy as np
 
 VERSION = "2.0.2"
 
-# Define extensions individually
 extensions = [
     Extension(
         "etlportfolio.optimized.risk_criteria",
@@ -32,7 +31,7 @@ setup(
         "Operating System :: Microsoft :: Windows :: Windows 11",
     ],
     packages=find_packages(),
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     install_requires=[
         "yfinance",
         "pandas",
@@ -41,8 +40,9 @@ setup(
         "matplotlib",
         "scipy",
     ],
-    ext_modules=cythonize(
-        extensions,
-        compiler_directives={'language_level': "3"}
-    ),
+    setup_requires=[
+        "Cython>=3.0",
+        "numpy",
+    ],
+    ext_modules=cythonize(extensions, compiler_directives={'language_level': "3"}),
 )
