@@ -37,7 +37,7 @@ packages = ["etlportfolio"]
 packages = ["etlportfolio"]
 
 [tool.hatch.build.targets.wheel.force-include]
-"etlportfolio/optimized" = "etlportfolio/optimized"
+"etlportfolio/optimized/" = "etlportfolio/optimized/"
 
 [tool.hatch.build.hooks.custom]
 dependencies = ["Cython>=3.0", "numpy"]
