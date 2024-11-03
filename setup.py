@@ -3,7 +3,7 @@ from Cython.Build import cythonize
 import numpy as np
 
 
-VERSION = "2.0.1"
+VERSION = "2.0.2"
 
 # Define extensions individually
 extensions = [
