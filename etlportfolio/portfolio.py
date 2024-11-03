@@ -9,6 +9,7 @@ import seaborn as sns
 from scipy.integrate import quad
 from scipy.optimize import minimize
 from scipy.stats import norm
+from etlportfolio.optimized.risk_criteria import compute_lpm_integrand, compute_cvar_integrand, compute_portfolio_moments
 
 
 @dataclass
@@ -77,7 +78,7 @@ class Portfolio(ABC):
         Parameters
         ----------
         weights : np.ndarray
-            Vector of portoflio weights.
+            Vector of portfolio weights.
 
         """
 
@@ -175,7 +176,8 @@ class MVOPortfolio(Portfolio):
             Vector of portfolio weights
 
         """
-        return np.sqrt(np.dot(weights.T, np.dot(self.forecast_variance, weights)))
+        _, port_vol = compute_portfolio_moments(weights, self.forecast_returns, self.forecast_variance)
+        return port_vol
 
     def objective(self, weights: np.ndarray) -> float:
         """Compute portfolio objective function.
@@ -233,15 +235,8 @@ class LPMPortfolio(Portfolio):
             Vector of portfolio weights.
 
         """
-        port_ret = np.dot(weights.T, self.forecast_returns)
-        port_vol = np.sqrt(np.dot(weights.T, np.dot(self.forecast_variance, weights)))
-        lpm_result = quad(
-            lambda x: (self.tau - x) ** self.power
-            * norm.pdf(x, loc=port_ret, scale=port_vol),
-            -np.inf,
-            self.tau,
-        )
-        return lpm_result[0]
+        port_ret, port_vol = compute_portfolio_moments(weights, self.forecast_returns, self.forecast_variance)
+        return compute_lpm_integrand(self.tau, self.power, port_ret, port_vol)
 
     def objective(self, weights: np.ndarray) -> float:
         """Compute LPM portfolio objective function.
@@ -307,17 +302,10 @@ class CVaRPortfolio(Portfolio):
             Vector of portfolio weights.
 
         """
-        port_ret = np.dot(weights.T, self.forecast_returns)
-        port_vol = np.sqrt(np.dot(weights.T, np.dot(self.forecast_variance, weights)))
-
+        port_ret, port_vol = compute_portfolio_moments(weights, self.forecast_returns, self.forecast_variance)
         var = norm.ppf(q=self.theta, loc=port_ret, scale=port_vol)
-        cvar_result = quad(
-            lambda x: x * norm.pdf(x, loc=port_ret, scale=port_vol),
-            -np.inf,
-            var,
-        )
-
-        return cvar_result[0] / self.theta
+        cvar_result = compute_cvar_integrand(var, port_ret, port_vol)
+        return cvar_result / self.theta
 
     def objective(self, weights: np.ndarray) -> float:
         """Compute objective function for mean-cvar optimisation.
@@ -380,16 +368,8 @@ class ETLPortfolio(Portfolio):
             Vector of portfolio weights.
 
         """
-        port_ret = np.dot(weights.T, self.forecast_returns)
-        port_vol = np.sqrt(np.dot(weights.T, np.dot(self.forecast_variance, weights)))
-
-        etl_result = quad(
-            lambda x: x * norm.pdf(x, loc=port_ret, scale=port_vol),
-            -np.inf,
-            self.k,
-        )
-
-        return etl_result[0]
+        port_ret, port_vol = compute_portfolio_moments(weights, self.forecast_returns, self.forecast_variance)
+        return compute_cvar_integrand(self.k, port_ret, port_vol)
 
     def objective(self, weights: np.ndarray) -> float:
         """Compute objective function for Mean-ETL optimisation.
