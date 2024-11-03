@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Extract current version from setup.py
-current_version=$(grep -m1 'version=' setup.py | cut -d'"' -f2)
+current_version=$(grep -m1 'VERSION = ' setup.py | cut -d'"' -f2)
 echo "Current version: $current_version"
 
 # Split version into components
@@ -13,7 +13,7 @@ new_version="${major}.${minor}.${new_patch}"
 echo "New version: $new_version"
 
 # Update setup.py with new version
-sed -i "s/version=\".*\"/version=\"$new_version\"/" setup.py
+sed -i "s/VERSION = \".*\"/VERSION = \"$new_version\"/" setup.py
 
 # Configure git
 git config --local user.email "github-actions[bot]@users.noreply.github.com"

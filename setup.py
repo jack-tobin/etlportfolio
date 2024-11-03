@@ -2,6 +2,9 @@ from setuptools import setup, find_packages, Extension
 from Cython.Build import cythonize
 import numpy as np
 
+
+VERSION = "2.0.1"
+
 # Define extensions individually
 extensions = [
     Extension(
@@ -13,7 +16,7 @@ extensions = [
 
 setup(
     name="etlportfolio",
-    version="2.0.1",
+    version=VERSION,
     author="Jack Tobin",
     author_email="tobjack330@gmail.com",
     description="Expected tail loss portfolio optimisation in python",
